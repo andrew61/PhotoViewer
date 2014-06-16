@@ -1,0 +1,275 @@
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+
+
+public class Viewer extends JFrame
+{
+	
+    JLabel image;
+    Image img;
+    File file;
+    int j = 0;
+    int i;
+    String filePath;
+    int currentIndex;
+    //file array
+    File[] allFiles = new File[currentIndex];
+	public Viewer()
+	{
+		
+		setSize(1000, 1000);
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		setVisible(true);
+		setResizable(true);
+		setLocationRelativeTo(null);
+
+		JButton jb = new JButton("OPEN");
+		JButton right = new JButton("NEXT");
+	    right.setMnemonic(KeyEvent.VK_RIGHT);
+
+		JButton left = new JButton("LEFT");
+	    left.setMnemonic(KeyEvent.VK_LEFT);
+	    
+	    final JButton options = new JButton("OPTIONS");
+		
+		final JPanel pl = new JPanel(new BorderLayout());
+		pl.setSize(800, 800);
+		add(pl);
+		pl.setBackground(Color.BLACK);
+		
+		pl.add(jb, BorderLayout.NORTH);
+		pl.add(right, BorderLayout.EAST);
+		pl.add(left, BorderLayout.WEST);
+		pl.add(options, BorderLayout.PAGE_END);
+			
+		/*
+		 * create action listener for button that creates a file chooser
+		 * that adds file location of image to label.
+		 * 
+		 */
+		
+        image = new JLabel(" ");
+        image.setPreferredSize(new Dimension(300, 300));
+        pl.add(image, BorderLayout.CENTER);
+           
+        jb.addActionListener(new ActionListener() 
+        {
+            public void actionPerformed(ActionEvent ae) 
+            {
+            	FileFilter imageFilter = new FileNameExtensionFilter(
+            		    "Image files", ImageIO.getReaderFileSuffixes());
+            	
+                JFileChooser fc = new JFileChooser();
+                fc.setFileFilter(imageFilter);
+                int result = fc.showOpenDialog(null);
+                if (result == JFileChooser.APPROVE_OPTION) 
+                {
+                    file = fc.getSelectedFile();
+                    filePath = file.getAbsolutePath();
+                    System.out.println(filePath);
+                    allFiles = file.getParentFile().listFiles();
+                    //currentIndex gets position of file in folder
+                    currentIndex = Arrays.asList(allFiles).indexOf(file);
+                   
+           
+                    try 
+                    {  	
+                        image.setIcon(new ImageIcon(ImageIO.read(file)));
+                    } 
+                    catch (IOException e) 
+                    {
+                        e.printStackTrace();
+                    }
+                    
+                    System.out.println(allFiles);
+                    System.out.println(currentIndex);
+
+
+                }
+            }
+        });
+        //next image
+        right.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{        		
+        		currentIndex++;
+                allFiles = file.getParentFile().listFiles(/* add filter*/);
+                file = allFiles[currentIndex];
+                
+                try
+        		{
+        			image.setIcon(new ImageIcon(ImageIO.read(file)));
+        		}
+        		catch(IOException ea)
+        		{
+        			ea.printStackTrace();
+        		}	
+        		System.out.println("Current Index" + currentIndex);
+                pl.add(image, BorderLayout.CENTER);
+                pl.repaint();
+                System.out.println("File Path" + filePath);
+                System.out.println("File" + file);
+                System.out.println("Array with currentIndex" + allFiles[currentIndex]);
+                System.out.println("Array" + allFiles);
+
+                
+                
+        	}
+        });
+        //previous image
+        left.addActionListener(new ActionListener()
+        {
+        	public void actionPerformed(ActionEvent e)
+        	{
+        		
+        		currentIndex--;
+        	    allFiles = file.getParentFile().listFiles(/* add filter*/);
+                file = allFiles[currentIndex];
+        		try
+        		{
+        			image.setIcon(new ImageIcon(ImageIO.read(file)));
+        		}
+        		catch(IOException ea)
+        		{
+        			ea.printStackTrace();
+        		}
+        		System.out.println("Current Index" + currentIndex);
+                pl.add(image, BorderLayout.CENTER);
+                pl.repaint();
+                System.out.println("File Path" + filePath);
+                System.out.println("File" + file);
+                System.out.println("Array with currentIndex" + allFiles[currentIndex]);
+                System.out.println("Array" + allFiles);
+
+        		
+        	}
+        });
+        
+
+		options.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				j++;
+				if(j >= 1)
+				{
+					options.setEnabled(false);
+				}
+			
+			
+				final JFrame frame = new JFrame();
+				frame.setSize(450, 450);
+				frame.setVisible(true);
+				frame.setLocationRelativeTo(null);
+				frame.setResizable(false);
+				
+				JPanel p1 = new JPanel();
+				p1.setBackground(Color.DARK_GRAY);
+				p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
+				frame.add(p1);
+				p1.setSize(450, 450);
+				
+				JButton b1 = new JButton("FULLSCREEN");
+				p1.add(b1, p1);
+						
+				/*JButton b3 = new JButton("SLIDESHOW");
+				p1.add(b3, p1);
+				*/
+				JButton b2 = new JButton("EXIT");
+				p1.add(b2, p1);
+				
+
+				
+				b1.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ae)
+					{
+						j--;
+						options.setEnabled(true);
+						frame.dispose();
+						setExtendedState(MAXIMIZED_BOTH);
+						setUndecorated(true);
+						
+					}
+				});
+				
+				/*
+				b3.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ae)
+					{
+						//slideshow
+						j--;
+						options.setEnabled(true);
+						frame.dispose();
+						setExtendedState(MAXIMIZED_BOTH);
+						
+						for(i = 0; i < 300; i++)
+						{
+							currentIndex++;
+							
+							try 
+							{		
+							    wait(1000);
+							} 
+							catch(InterruptedException ex) 
+							{
+							    Thread.currentThread().interrupt();
+							}
+							
+							allFiles = file.getParentFile().listFiles();
+			                file = allFiles[currentIndex];
+			        		try
+			        		{
+			        			image.setIcon(new ImageIcon(ImageIO.read(file)));
+			        		}
+			        		catch(IOException ea)
+			        		{
+			        			ea.printStackTrace();
+			        		}
+			        		System.out.println("Current Index" + currentIndex);  
+			        		pl.add(image, BorderLayout.CENTER);
+			                pl.repaint();
+			                System.out.println("File" + file);
+						}
+						
+						
+					}
+				});
+				*/
+				b2.addActionListener(new ActionListener()
+				{
+					public void actionPerformed(ActionEvent ae)
+					{
+						j--;
+						options.setEnabled(true);
+						System.exit(0);
+						
+					}
+				});
+			
+			}	
+		});
+		
+	
+	}
+
+	public static void main(String[]args)
+	{
+		new Viewer();		
+	}
+}
